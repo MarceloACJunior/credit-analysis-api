@@ -1,0 +1,37 @@
+server:
+  port: 9001
+spring:
+  application:
+    name: credit-analysis
+
+  cloud:
+    openfeign:
+      client:
+        config:
+          clientApiClient:
+            connectTimeout: 3000
+            readTimeout: 500
+            loggerLevel: BASIC
+  sql:
+    init:
+      continue-on-error: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: admin
+    password: senha123
+    hikari:
+      minimum-idle: 0
+      maximum-pool-size: 15
+      connection-timeout: 3000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      initialization-fail-timeout: -1
+      validation-timeout: 1000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: false
+    show-sql: true
+
+url:
+  clientApi.host: https://localhost:8080/v1.0/clients

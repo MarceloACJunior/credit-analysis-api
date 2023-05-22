@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreditAnalysisModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">credit-analysis</a> &gt; <a href="index.source.html" class="el_package">com.jazztech.creditanalysis.model</a> &gt; <span class="el_source">CreditAnalysisModel.java</span></div><h1>CreditAnalysisModel.java</h1><pre class="source lang-java linenums">package com.jazztech.creditanalysis.model;
+
+import jakarta.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+import java.util.UUID;
+import lombok.Builder;
+
+public record CreditAnalysisModel(
+        @NotBlank(message = &quot;clientId cannot be null&quot;)
+        UUID clientId,
+        @NotBlank(message = &quot;approved cannot be null&quot;)
+        Boolean approved,
+        BigDecimal approvedLimit,
+        @NotBlank(message = &quot;requestedAmount cannot be null&quot;)
+        BigDecimal requestedAmount,
+        @NotBlank(message = &quot;monthlyIncome cannot be null&quot;)
+        BigDecimal monthlyIncome,
+        BigDecimal withdraw,
+        Double annualInterest
+) {
+
+<span class="nc" id="L22">    @Builder(toBuilder = true)</span>
+    public CreditAnalysisModel(UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount,
+<span class="nc" id="L24">                               BigDecimal monthlyIncome, BigDecimal withdraw, Double annualInterest) {</span>
+<span class="nc" id="L25">        this.clientId = clientId;</span>
+<span class="nc" id="L26">        this.approved = approved;</span>
+<span class="nc" id="L27">        this.approvedLimit = approvedLimit;</span>
+<span class="nc" id="L28">        this.requestedAmount = requestedAmount;</span>
+<span class="nc" id="L29">        this.monthlyIncome = monthlyIncome;</span>
+<span class="nc" id="L30">        this.withdraw = withdraw;</span>
+<span class="nc" id="L31">        this.annualInterest = annualInterest;</span>
+<span class="nc" id="L32">    }</span>
+
+    public CreditAnalysisModel updateCreditModel(boolean approved) {
+<span class="nc" id="L35">        return this.toBuilder()</span>
+<span class="nc" id="L36">                .clientId(this.clientId).build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
