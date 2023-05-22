@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreditAnalysisService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">credit-analysis</a> &gt; <a href="index.source.html" class="el_package">com.jazztech.creditanalysis.service</a> &gt; <span class="el_source">CreditAnalysisService.java</span></div><h1>CreditAnalysisService.java</h1><pre class="source lang-java linenums">package com.jazztech.creditanalysis.service;
+
+import com.jazztech.creditanalysis.apiclient.ClientApiClient;
+import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
+import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
+import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
+import com.jazztech.creditanalysis.mapper.CreditAnalysisMapper;
+import com.jazztech.creditanalysis.model.CreditAnalysisModel;
+import com.jazztech.creditanalysis.repository.CreditAnalysisRepository;
+import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
+import feign.FeignException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+<span class="fc" id="L19">@RequiredArgsConstructor</span>
+public class CreditAnalysisService {
+    private final ClientApiClient clientApiClient;
+    private final CreditAnalysisMapper creditAnalysisMapper;
+    private final CreditAnalysisRepository creditAnalysisRepository;
+
+    public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
+<span class="nc" id="L26">        final CreditAnalysisModel creditAnalysisModel = checkIfClientExists(creditAnalysisRequest);</span>
+<span class="nc" id="L27">        final CreditAnalysisEntity creditAnalysisEntity = checkConditionals(creditAnalysisModel);</span>
+<span class="nc" id="L28">        final CreditAnalysisEntity creditAnalysisSaved = creditAnalysisRepository.save(creditAnalysisEntity);</span>
+<span class="nc" id="L29">        return creditAnalysisMapper.responseFromEntity(creditAnalysisSaved);</span>
+    }
+
+    private CreditAnalysisModel checkIfClientExists(CreditAnalysisRequest creditAnalysisRequest) {
+        try {
+<span class="nc" id="L34">            clientApiClient.getClientById(creditAnalysisRequest.clientId());</span>
+<span class="nc" id="L35">        } catch (FeignException fe) {</span>
+<span class="nc" id="L36">            throw new ClientNotFoundException(&quot;Client not found by id %s&quot;.formatted(creditAnalysisRequest.clientId()));</span>
+<span class="nc" id="L37">        }</span>
+<span class="nc" id="L38">        return creditAnalysisMapper.modelFromRequest(creditAnalysisRequest);</span>
+    }
+
+    private CreditAnalysisEntity checkConditionals(CreditAnalysisModel creditAnalysisModel) {
+
+<span class="nc" id="L43">        final BigDecimal monthlyIncome = creditAnalysisModel.monthlyIncome();</span>
+<span class="nc" id="L44">        final BigDecimal requestedAmount = creditAnalysisModel.requestedAmount();</span>
+<span class="nc" id="L45">        final int requestedAmountIsGreaterThanMonthlyIncome = requestedAmount.compareTo(monthlyIncome);</span>
+
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (requestedAmountIsGreaterThanMonthlyIncome &gt; 0) {</span>
+<span class="nc" id="L48">            final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()</span>
+<span class="nc" id="L49">                    .clientId(creditAnalysisModel.clientId())</span>
+<span class="nc" id="L50">                    .approved(false)</span>
+<span class="nc" id="L51">                    .requestedAmount(creditAnalysisModel.requestedAmount())</span>
+<span class="nc" id="L52">                    .monthlyIncome(creditAnalysisModel.monthlyIncome())</span>
+<span class="nc" id="L53">                    .build();</span>
+<span class="nc" id="L54">            System.out.println(creditAnalysisModelUpdated.toString());</span>
+<span class="nc" id="L55">            return creditAnalysisMapper.entityFromModel(creditAnalysisModelUpdated);</span>
+        } else {
+<span class="nc" id="L57">            final BigDecimal approvedLimitVar = checkApprovedLimit(monthlyIncome, requestedAmount);</span>
+<span class="nc" id="L58">            final BigDecimal withdrawLimitVar = checkWithdrawLimit(approvedLimitVar);</span>
+<span class="nc" id="L59">            final Double annualInterestVar = 0.15;</span>
+<span class="nc" id="L60">            final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()</span>
+<span class="nc" id="L61">                    .clientId(creditAnalysisModel.clientId())</span>
+<span class="nc" id="L62">                    .approved(true)</span>
+<span class="nc" id="L63">                    .approvedLimit(approvedLimitVar)</span>
+<span class="nc" id="L64">                    .requestedAmount(creditAnalysisModel.requestedAmount())</span>
+<span class="nc" id="L65">                    .monthlyIncome(creditAnalysisModel.monthlyIncome())</span>
+<span class="nc" id="L66">                    .withdraw(withdrawLimitVar)</span>
+<span class="nc" id="L67">                    .annualInterest(annualInterestVar)</span>
+<span class="nc" id="L68">                    .build();</span>
+<span class="nc" id="L69">            System.out.println(creditAnalysisModelUpdated.toString());</span>
+<span class="nc" id="L70">            return creditAnalysisMapper.entityFromModel(creditAnalysisModelUpdated);</span>
+        }
+    }
+
+    private BigDecimal checkApprovedLimit(BigDecimal monthlyIncome, BigDecimal requestedAmount) {
+
+<span class="nc" id="L76">        final BigDecimal maxMonthlyIncome = BigDecimal.valueOf(50000);</span>
+<span class="nc" id="L77">        BigDecimal consideredValue = monthlyIncome;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (monthlyIncome.compareTo(maxMonthlyIncome) &gt; 0) {</span>
+<span class="nc" id="L79">            consideredValue = maxMonthlyIncome;</span>
+        }
+
+        final BigDecimal approvedLimit;
+<span class="nc" id="L83">        final BigDecimal fiftyPercentOfConsideredValue = consideredValue.divide(BigDecimal.valueOf(2));</span>
+<span class="nc" id="L84">        final int requestedAmountIsGreaterThanHalfOfConsideredValue = requestedAmount.compareTo(fiftyPercentOfConsideredValue);</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if (requestedAmountIsGreaterThanHalfOfConsideredValue &gt; 0) {</span>
+<span class="nc" id="L86">            final BigDecimal fifteenPercentOfConsideredValue = BigDecimal.valueOf(0.15);</span>
+<span class="nc" id="L87">            approvedLimit = consideredValue.multiply(fifteenPercentOfConsideredValue);</span>
+<span class="nc" id="L88">        } else {</span>
+<span class="nc" id="L89">            final BigDecimal thirtyPercentOfConsideredValue = BigDecimal.valueOf(0.30);</span>
+<span class="nc" id="L90">            approvedLimit = consideredValue.multiply(thirtyPercentOfConsideredValue);</span>
+        }
+<span class="nc" id="L92">        return approvedLimit;</span>
+    }
+
+    private BigDecimal checkWithdrawLimit(BigDecimal approvedLimitVar) {
+<span class="nc" id="L96">        return approvedLimitVar.multiply(BigDecimal.valueOf(0.10));</span>
+    }
+
+    public List&lt;CreditAnalysisResponse&gt; getAllCreditAnalysis() {
+<span class="nc" id="L100">        return creditAnalysisMapper.listOfModelFromEntity(creditAnalysisRepository.findAll());</span>
+    }
+
+    public CreditAnalysisResponse getCreditAnalysisById(UUID creditAnalysisId) {
+<span class="nc" id="L104">        final CreditAnalysisEntity creditAnalysisEntity = creditAnalysisRepository.findById(creditAnalysisId)</span>
+<span class="nc" id="L105">                .orElseThrow(() -&gt; new ClientNotFoundException(&quot;Client not found by id %s&quot;.formatted(creditAnalysisId)));</span>
+<span class="nc" id="L106">        return creditAnalysisMapper.responseFromEntity(creditAnalysisEntity);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

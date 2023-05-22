@@ -1,0 +1,109 @@
+package com.jazztech.creditanalysis.service;
+
+import com.jazztech.creditanalysis.apiclient.ClientApiClient;
+import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
+import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
+import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
+import com.jazztech.creditanalysis.mapper.CreditAnalysisMapper;
+import com.jazztech.creditanalysis.model.CreditAnalysisModel;
+import com.jazztech.creditanalysis.repository.CreditAnalysisRepository;
+import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
+import feign.FeignException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class CreditAnalysisService {
+    private final ClientApiClient clientApiClient;
+    private final CreditAnalysisMapper creditAnalysisMapper;
+    private final CreditAnalysisRepository creditAnalysisRepository;
+
+    public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
+        final CreditAnalysisModel creditAnalysisModel = checkIfClientExists(creditAnalysisRequest);
+        final CreditAnalysisEntity creditAnalysisEntity = checkConditionals(creditAnalysisModel);
+        final CreditAnalysisEntity creditAnalysisSaved = creditAnalysisRepository.save(creditAnalysisEntity);
+        return creditAnalysisMapper.responseFromEntity(creditAnalysisSaved);
+    }
+
+    private CreditAnalysisModel checkIfClientExists(CreditAnalysisRequest creditAnalysisRequest) {
+        try {
+            clientApiClient.getClientById(creditAnalysisRequest.clientId());
+        } catch (FeignException fe) {
+            throw new ClientNotFoundException("Client not found by id %s".formatted(creditAnalysisRequest.clientId()));
+        }
+        return creditAnalysisMapper.modelFromRequest(creditAnalysisRequest);
+    }
+
+    private CreditAnalysisEntity checkConditionals(CreditAnalysisModel creditAnalysisModel) {
+
+        final BigDecimal requestedAmountVar = creditAnalysisModel.requestedAmount();
+        final BigDecimal monthlyIncomeVar = creditAnalysisModel.monthlyIncome();
+        final int requestedAmountIsGreaterThanMonthlyIncome = requestedAmountVar.compareTo(monthlyIncomeVar);
+
+        if (requestedAmountIsGreaterThanMonthlyIncome > 0) {
+            final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
+                    .clientId(creditAnalysisModel.clientId())
+                    .approved(false)
+                    .requestedAmount(requestedAmountVar.setScale(2, RoundingMode.HALF_UP))
+                    .monthlyIncome(monthlyIncomeVar.setScale(2, RoundingMode.HALF_UP))
+                    .build();
+            System.out.println(creditAnalysisModelUpdated.toString());
+            return creditAnalysisMapper.entityFromModel(creditAnalysisModelUpdated);
+        } else {
+            final BigDecimal approvedLimitVar = checkApprovedLimit(monthlyIncomeVar, requestedAmountVar);
+            final BigDecimal withdrawLimitVar = checkWithdrawLimit(approvedLimitVar);
+            final Double annualInterestVar = 0.15;
+            final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
+                    .clientId(creditAnalysisModel.clientId())
+                    .approved(true)
+                    .approvedLimit(approvedLimitVar.setScale(2, RoundingMode.HALF_UP))
+                    .requestedAmount(requestedAmountVar.setScale(2, RoundingMode.HALF_UP))
+                    .monthlyIncome(monthlyIncomeVar.setScale(2, RoundingMode.HALF_UP))
+                    .withdraw(withdrawLimitVar.setScale(2, RoundingMode.HALF_UP))
+                    .annualInterest(annualInterestVar)
+                    .build();
+            System.out.println(creditAnalysisModelUpdated.toString());
+            return creditAnalysisMapper.entityFromModel(creditAnalysisModelUpdated);
+        }
+    }
+
+    private BigDecimal checkApprovedLimit(BigDecimal monthlyIncome, BigDecimal requestedAmount) {
+
+        final BigDecimal maxMonthlyIncome = BigDecimal.valueOf(50000);
+        BigDecimal consideredValue = monthlyIncome;
+        if (monthlyIncome.compareTo(maxMonthlyIncome) > 0) {
+            consideredValue = maxMonthlyIncome;
+        }
+
+        final BigDecimal approvedLimit;
+        final BigDecimal fiftyPercentOfConsideredValue = consideredValue.divide(BigDecimal.valueOf(2));
+        final int requestedAmountIsGreaterThanHalfOfConsideredValue = requestedAmount.compareTo(fiftyPercentOfConsideredValue);
+        if (requestedAmountIsGreaterThanHalfOfConsideredValue > 0) {
+            final BigDecimal fifteenPercentOfConsideredValue = BigDecimal.valueOf(0.15);
+            approvedLimit = consideredValue.multiply(fifteenPercentOfConsideredValue);
+        } else {
+            final BigDecimal thirtyPercentOfConsideredValue = BigDecimal.valueOf(0.30);
+            approvedLimit = consideredValue.multiply(thirtyPercentOfConsideredValue);
+        }
+        return approvedLimit;
+    }
+
+    private BigDecimal checkWithdrawLimit(BigDecimal approvedLimitVar) {
+        return approvedLimitVar.multiply(BigDecimal.valueOf(0.10));
+    }
+
+    public List<CreditAnalysisResponse> getAllCreditAnalysis() {
+        return creditAnalysisMapper.listOfModelFromEntity(creditAnalysisRepository.findAll());
+    }
+
+    public CreditAnalysisResponse getCreditAnalysisById(UUID creditAnalysisId) {
+        final CreditAnalysisEntity creditAnalysisEntity = creditAnalysisRepository.findById(creditAnalysisId)
+                .orElseThrow(() -> new ClientNotFoundException("Client not found by id %s".formatted(creditAnalysisId)));
+        return creditAnalysisMapper.responseFromEntity(creditAnalysisEntity);
+    }
+}

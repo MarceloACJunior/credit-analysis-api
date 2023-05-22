@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreditAnalysisMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">credit-analysis</a> &gt; <a href="index.source.html" class="el_package">com.jazztech.creditanalysis.mapper</a> &gt; <span class="el_source">CreditAnalysisMapperImpl.java</span></div><h1>CreditAnalysisMapperImpl.java</h1><pre class="source lang-java linenums">package com.jazztech.creditanalysis.mapper;
+
+import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
+import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
+import com.jazztech.creditanalysis.model.CreditAnalysisModel;
+import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2023-05-19T11:51:34-0300&quot;,
+    comments = &quot;version: 1.5.3.Final, compiler: javac, environment: Java 17 (Oracle Corporation)&quot;
+)
+@Component
+<span class="fc" id="L21">public class CreditAnalysisMapperImpl implements CreditAnalysisMapper {</span>
+
+    @Override
+    public CreditAnalysisModel modelFromRequest(CreditAnalysisRequest creditAnalysisRequest) {
+<span class="nc bnc" id="L25" title="All 2 branches missed.">        if ( creditAnalysisRequest == null ) {</span>
+<span class="nc" id="L26">            return null;</span>
+        }
+
+<span class="nc" id="L29">        CreditAnalysisModel.CreditAnalysisModelBuilder creditAnalysisModel = CreditAnalysisModel.builder();</span>
+
+<span class="nc" id="L31">        creditAnalysisModel.clientId( creditAnalysisRequest.clientId() );</span>
+<span class="nc" id="L32">        creditAnalysisModel.requestedAmount( creditAnalysisRequest.requestedAmount() );</span>
+<span class="nc" id="L33">        creditAnalysisModel.monthlyIncome( creditAnalysisRequest.monthlyIncome() );</span>
+
+<span class="nc" id="L35">        return creditAnalysisModel.build();</span>
+    }
+
+    @Override
+    public CreditAnalysisEntity entityFromModel(CreditAnalysisModel creditAnalysisModel) {
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if ( creditAnalysisModel == null ) {</span>
+<span class="nc" id="L41">            return null;</span>
+        }
+
+<span class="nc" id="L44">        CreditAnalysisEntity.CreditAnalysisEntityBuilder creditAnalysisEntity = CreditAnalysisEntity.builder();</span>
+
+<span class="nc" id="L46">        creditAnalysisEntity.clientId( creditAnalysisModel.clientId() );</span>
+<span class="nc" id="L47">        creditAnalysisEntity.approved( creditAnalysisModel.approved() );</span>
+<span class="nc" id="L48">        creditAnalysisEntity.approvedLimit( creditAnalysisModel.approvedLimit() );</span>
+<span class="nc" id="L49">        creditAnalysisEntity.requestedAmount( creditAnalysisModel.requestedAmount() );</span>
+<span class="nc" id="L50">        creditAnalysisEntity.monthlyIncome( creditAnalysisModel.monthlyIncome() );</span>
+<span class="nc" id="L51">        creditAnalysisEntity.withdraw( creditAnalysisModel.withdraw() );</span>
+<span class="nc" id="L52">        creditAnalysisEntity.annualInterest( creditAnalysisModel.annualInterest() );</span>
+
+<span class="nc" id="L54">        return creditAnalysisEntity.build();</span>
+    }
+
+    @Override
+    public CreditAnalysisResponse responseFromEntity(CreditAnalysisEntity creditAnalysisEntity) {
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        if ( creditAnalysisEntity == null ) {</span>
+<span class="nc" id="L60">            return null;</span>
+        }
+
+<span class="nc" id="L63">        UUID id = null;</span>
+<span class="nc" id="L64">        Boolean approved = null;</span>
+<span class="nc" id="L65">        BigDecimal approvedLimit = null;</span>
+<span class="nc" id="L66">        BigDecimal withdraw = null;</span>
+<span class="nc" id="L67">        Double annualInterest = null;</span>
+<span class="nc" id="L68">        UUID clientId = null;</span>
+<span class="nc" id="L69">        LocalDateTime date = null;</span>
+
+<span class="nc" id="L71">        id = creditAnalysisEntity.getId();</span>
+<span class="nc" id="L72">        approved = creditAnalysisEntity.getApproved();</span>
+<span class="nc" id="L73">        approvedLimit = creditAnalysisEntity.getApprovedLimit();</span>
+<span class="nc" id="L74">        withdraw = creditAnalysisEntity.getWithdraw();</span>
+<span class="nc" id="L75">        annualInterest = creditAnalysisEntity.getAnnualInterest();</span>
+<span class="nc" id="L76">        clientId = creditAnalysisEntity.getClientId();</span>
+<span class="nc" id="L77">        date = creditAnalysisEntity.getDate();</span>
+
+<span class="nc" id="L79">        CreditAnalysisResponse creditAnalysisResponse = new CreditAnalysisResponse( id, approved, approvedLimit, withdraw, annualInterest, clientId, date );</span>
+
+<span class="nc" id="L81">        return creditAnalysisResponse;</span>
+    }
+
+    @Override
+    public List&lt;CreditAnalysisResponse&gt; listOfModelFromEntity(List&lt;CreditAnalysisEntity&gt; creditAnalysisEntities) {
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if ( creditAnalysisEntities == null ) {</span>
+<span class="nc" id="L87">            return null;</span>
+        }
+
+<span class="nc" id="L90">        List&lt;CreditAnalysisResponse&gt; list = new ArrayList&lt;CreditAnalysisResponse&gt;( creditAnalysisEntities.size() );</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        for ( CreditAnalysisEntity creditAnalysisEntity : creditAnalysisEntities ) {</span>
+<span class="nc" id="L92">            list.add( responseFromEntity( creditAnalysisEntity ) );</span>
+<span class="nc" id="L93">        }</span>
+
+<span class="nc" id="L95">        return list;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
