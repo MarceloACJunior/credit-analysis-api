@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,20 +23,32 @@ public class CreditAnalysisController {
     private final CreditAnalysisService creditAnalysisService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public CreditAnalysisResponse requestCreditAnalysis(@RequestBody CreditAnalysisRequest creditAnalysisRequest) {
         return creditAnalysisService.creditAnalysisRequest(creditAnalysisRequest);
-    }
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public List<CreditAnalysisResponse> getAllAnalysis() {
-        return creditAnalysisService.getAllCreditAnalysis();
     }
 
     @GetMapping("{creditAnalysisId}")
     @ResponseStatus(HttpStatus.FOUND)
     public CreditAnalysisResponse getCreditAnalysisById(@PathVariable UUID creditAnalysisId) {
         return creditAnalysisService.getCreditAnalysisById(creditAnalysisId);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.FOUND)
+    public List<CreditAnalysisResponse> getAllAnalysis() {
+        return creditAnalysisService.getAllCreditAnalysis();
+    }
+
+    @GetMapping("/findBy-clientId/{creditAnalysisClientId}")
+    @ResponseStatus(HttpStatus.FOUND)
+    public List<CreditAnalysisResponse> getCreditAnalysisByClientId(@PathVariable UUID creditAnalysisClientId) {
+        return creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisClientId);
+    }
+
+    @GetMapping("/findBy-clientCPF")
+    @ResponseStatus(HttpStatus.FOUND)
+    public List<CreditAnalysisResponse> getCreditAnalysisByClientCPF(@RequestParam(value = "cpf", required = false) String creditAnalysisClientCPF) {
+        return creditAnalysisService.getCreditAnalysisByCPF(creditAnalysisClientCPF);
     }
 }

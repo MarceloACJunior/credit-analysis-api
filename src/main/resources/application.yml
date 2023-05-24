@@ -34,4 +34,4 @@ spring:
     show-sql: true
 
 url:
-  clientApi.host: https://localhost:8080/v1.0/clients
+  client-api.host: http://localhost:8080/v1.0/clients
