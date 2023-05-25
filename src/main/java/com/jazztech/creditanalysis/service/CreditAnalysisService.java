@@ -33,8 +33,7 @@ public class CreditAnalysisService {
 
     public CreditAnalysisModel checkIfClientExists(CreditAnalysisRequest creditAnalysisRequest) {
         try {
-            final UUID clientUUID = creditAnalysisRequest.clientId();
-            clientApiClient.getClientById(clientUUID);
+            clientApiClient.getClientById(creditAnalysisRequest.clientId());
         } catch (FeignException fe) {
             throw new ClientNotFoundException("Client not found by id %s".formatted(creditAnalysisRequest.clientId()));
         }

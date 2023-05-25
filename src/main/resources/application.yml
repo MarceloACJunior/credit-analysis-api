@@ -33,5 +33,5 @@ spring:
     generate-ddl: false
     show-sql: true
 
-url:
-  client-api.host: http://localhost:8080/v1.0/clients
+#url:
+#  client-api.host: http://localhost:8080/v1.0/clients
