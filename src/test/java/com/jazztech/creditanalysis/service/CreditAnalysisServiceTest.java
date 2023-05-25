@@ -2,6 +2,7 @@ package com.jazztech.creditanalysis.service;
 
 import com.jazztech.creditanalysis.apiclient.ClientApiClient;
 import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
+import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
 import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
 import com.jazztech.creditanalysis.mapper.CreditAnalysisMapper;
 import com.jazztech.creditanalysis.mapper.CreditAnalysisMapperImpl;
@@ -16,10 +17,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.jazztech.creditanalysis.service.Factory.*;
-import static com.jazztech.creditanalysis.service.Factory.creditAnalysisRequestFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -35,6 +37,8 @@ class CreditAnalysisServiceTest {
     private CreditAnalysisMapper creditAnalysisMapper = new CreditAnalysisMapperImpl();
     @Captor
     private ArgumentCaptor<UUID> clientID;
+    @Captor
+    private ArgumentCaptor<UUID> analysisID;
 
     @InjectMocks
     private CreditAnalysisService creditAnalysisService;
@@ -65,12 +69,34 @@ class CreditAnalysisServiceTest {
     @Test
     void should_throw_ClientNotFoundException_when_clientId_does_not_exist(){
         when(clientApiClient.getClientById(clientID.capture())).thenThrow(FeignException.class);
-        ClientNotFoundException exception = assertThrows(ClientNotFoundException.class, () -> creditAnalysisService.checkIfClientExists(creditAnalysisRequestFactory()));
+        ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
+                () -> creditAnalysisService.checkIfClientExists(creditAnalysisRequestFactory()));
         assertEquals("Client not found by id %s".formatted(clientID.getValue()), exception.getMessage());
     }
 
     @Test
-    void should_consider_50_thousand_as_the_maximum_amount_in_the_credit_calculation(){
+    void should_approve_seven_thousand_and_five_hundred_credit_if_requested_amount_is_greater_than_half_of_fifty_thousand(){
+        final BigDecimal approvedLimit = creditAnalysisService.checkApprovedLimit(creditAnalysisModelGreaterThanFiftyPercent().monthlyIncome(), creditAnalysisModelGreaterThanFiftyPercent().requestedAmount());
+        assertEquals(BigDecimal.valueOf(7500.0), approvedLimit.setScale(1));
+    }
 
+    @Test
+    void should_approve_fifteen_thousand_credit_if_requested_amount_is_less_than_half_of_fifty_thousand(){
+        final BigDecimal approvedLimit = creditAnalysisService.checkApprovedLimit(creditAnalysisModelLessThanFiftyPercent().monthlyIncome(), creditAnalysisModelLessThanFiftyPercent().requestedAmount());
+        assertEquals(BigDecimal.valueOf(15000.0), approvedLimit.setScale(1));
+    }
+
+    @Test
+    void should_return_a_credit_analysis_if_it_exists_by_id(){
+        when(creditAnalysisRepository.findById(analysisID.capture())).thenReturn(Optional.ofNullable(creditAnalysisEntityFactory()));
+        final CreditAnalysisResponse creditAnalysisById = creditAnalysisService.getCreditAnalysisById(creditAnalysisEntityFactory().getId());
+        assertEquals(creditAnalysisById.id(), analysisID.getValue());
+    }
+
+    @Test
+    void should_throw_ClientNotFoundException_if_it_does_not_exist_by_id(){
+        when(creditAnalysisRepository.findById(analysisID.capture())).thenThrow(ClientNotFoundException.class);
+        ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
+                () -> creditAnalysisService.getCreditAnalysisById(UUID.randomUUID()));
     }
 }

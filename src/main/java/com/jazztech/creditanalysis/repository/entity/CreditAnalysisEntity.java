@@ -39,10 +39,9 @@ public class CreditAnalysisEntity {
     @Column(name = "date")
     LocalDateTime date;
 
-    @Builder
-    public CreditAnalysisEntity(UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount,
-                                BigDecimal monthlyIncome,
-                                BigDecimal withdraw, Double annualInterest) {
+    @Builder(toBuilder = true)
+    public CreditAnalysisEntity(UUID id, UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount, BigDecimal monthlyIncome, BigDecimal withdraw, Double annualInterest, LocalDateTime date) {
+        this.id = id;
         this.clientId = clientId;
         this.approved = approved;
         this.approvedLimit = approvedLimit;
@@ -50,6 +49,7 @@ public class CreditAnalysisEntity {
         this.monthlyIncome = monthlyIncome;
         this.withdraw = withdraw;
         this.annualInterest = annualInterest;
+        this.date = date;
     }
 
     private CreditAnalysisEntity() {

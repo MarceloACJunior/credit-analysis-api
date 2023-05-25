@@ -1,8 +1,8 @@
 package com.jazztech.creditanalysis.service;
 
-import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
 import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
 import com.jazztech.creditanalysis.model.CreditAnalysisModel;
+import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -33,5 +33,25 @@ public class Factory {
                 .build();
     }
 
-    public static CreditAnalysisModel creditAnalysisModel
+    public static CreditAnalysisModel creditAnalysisModelGreaterThanFiftyPercent(){
+        return CreditAnalysisModel.builder()
+                .approved(true)
+                .monthlyIncome(BigDecimal.valueOf(70000))
+                .requestedAmount(BigDecimal.valueOf(27000))
+                .build();
+    }
+
+    public static CreditAnalysisModel creditAnalysisModelLessThanFiftyPercent(){
+        return CreditAnalysisModel.builder()
+                .approved(true)
+                .monthlyIncome(BigDecimal.valueOf(70000))
+                .requestedAmount(BigDecimal.valueOf(25000))
+                .build();
+    }
+
+    public static CreditAnalysisEntity creditAnalysisEntityFactory(){
+        return CreditAnalysisEntity.builder()
+                .id(UUID.fromString("eea91dca-9532-4caf-8d88-4889b4c24839"))
+                .build();
+    }
 }
