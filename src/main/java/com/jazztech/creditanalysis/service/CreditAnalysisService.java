@@ -26,6 +26,9 @@ public class CreditAnalysisService {
 
     public static final Double ANNUAL_INTEREST = 0.15;
     public static final BigDecimal MAX_MONTHLY_INCOME = BigDecimal.valueOf(50_000);
+    public static final BigDecimal FIFTEEN_PERCENT_OF_CONSIDERED_VALUE = BigDecimal.valueOf(0.15);
+    public static final BigDecimal THIRTY_PERCENT_OF_CONSIDERED_VALUE = BigDecimal.valueOf(0.30);
+    public static final BigDecimal WITHDRAW_LIMIT = BigDecimal.valueOf(0.10);
 
     public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
         final CreditAnalysisModel creditAnalysisModel = checkIfClientExists(creditAnalysisRequest);
@@ -77,7 +80,6 @@ public class CreditAnalysisService {
     }
 
     public BigDecimal checkApprovedLimit(BigDecimal monthlyIncome, BigDecimal requestedAmount) {
-        // Criar constantes para valores constantes
         BigDecimal consideredValue = monthlyIncome;
         if (monthlyIncome.compareTo(MAX_MONTHLY_INCOME) > 0) {
             consideredValue = MAX_MONTHLY_INCOME;
@@ -87,18 +89,15 @@ public class CreditAnalysisService {
         final BigDecimal fiftyPercentOfConsideredValue = consideredValue.divide(BigDecimal.valueOf(2));
         final int requestedAmountIsGreaterThanHalfOfConsideredValue = requestedAmount.compareTo(fiftyPercentOfConsideredValue);
         if (requestedAmountIsGreaterThanHalfOfConsideredValue > 0) {
-            final BigDecimal fifteenPercentOfConsideredValue = BigDecimal.valueOf(0.15);
-            approvedLimit = consideredValue.multiply(fifteenPercentOfConsideredValue);
+            approvedLimit = consideredValue.multiply(FIFTEEN_PERCENT_OF_CONSIDERED_VALUE);
         } else {
-            final BigDecimal thirtyPercentOfConsideredValue = BigDecimal.valueOf(0.30);
-            approvedLimit = consideredValue.multiply(thirtyPercentOfConsideredValue);
+            approvedLimit = consideredValue.multiply(THIRTY_PERCENT_OF_CONSIDERED_VALUE);
         }
         return approvedLimit;
     }
 
     public BigDecimal checkWithdrawLimit(BigDecimal approvedLimitVar) {
-        final BigDecimal withdrawLimitVar = BigDecimal.valueOf(0.10);
-        return approvedLimitVar.multiply(withdrawLimitVar);
+        return approvedLimitVar.multiply(WITHDRAW_LIMIT);
     }
 
     public CreditAnalysisResponse getCreditAnalysisById(UUID creditAnalysisId) {
