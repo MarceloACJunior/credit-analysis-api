@@ -1,11 +1,7 @@
 package com.jazztech.creditanalysis.service;
 
 import com.jazztech.creditanalysis.apiclient.ClientApiClient;
-<<<<<<< HEAD
-import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
-=======
 import com.jazztech.creditanalysis.apiclient.clientdto.ClientDto;
->>>>>>> feature/credit-analise
 import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
 import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
 import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
@@ -27,6 +23,9 @@ public class CreditAnalysisService {
     private final ClientApiClient clientApiClient;
     private final CreditAnalysisMapper creditAnalysisMapper;
     private final CreditAnalysisRepository creditAnalysisRepository;
+
+    public static final Double ANNUAL_INTEREST = 0.15;
+    public static final BigDecimal MAX_MONTHLY_INCOME = BigDecimal.valueOf(50_000);
 
     public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
         final CreditAnalysisModel creditAnalysisModel = checkIfClientExists(creditAnalysisRequest);
@@ -51,28 +50,19 @@ public class CreditAnalysisService {
         final int requestedAmountIsGreaterThanMonthlyIncome = requestedAmountVar.compareTo(monthlyIncomeVar);
 
         if (requestedAmountIsGreaterThanMonthlyIncome > 0) {
-<<<<<<< HEAD
-=======
-            // utilizar BigDecimal.ZERO
->>>>>>> feature/credit-analise
             final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
                     .clientId(creditAnalysisModel.clientId())
                     .approved(false)
-                    .approvedLimit(BigDecimal.valueOf(0))
+                    .approvedLimit(BigDecimal.ZERO)
                     .requestedAmount(requestedAmountVar.setScale(2, RoundingMode.HALF_UP))
                     .monthlyIncome(monthlyIncomeVar.setScale(2, RoundingMode.HALF_UP))
-                    .withdraw(BigDecimal.valueOf(0))
+                    .withdraw(BigDecimal.ZERO)
                     .annualInterest(0D)
                     .build();
             return creditAnalysisMapper.entityFromModel(creditAnalysisModelUpdated);
         } else {
             final BigDecimal approvedLimitVar = checkApprovedLimit(monthlyIncomeVar, requestedAmountVar);
             final BigDecimal withdrawLimitVar = checkWithdrawLimit(approvedLimitVar);
-<<<<<<< HEAD
-=======
-            // Constante
->>>>>>> feature/credit-analise
-            final Double annualInterestVar = 0.15;
             final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
                     .clientId(creditAnalysisModel.clientId())
                     .approved(true)
@@ -80,22 +70,17 @@ public class CreditAnalysisService {
                     .requestedAmount(requestedAmountVar.setScale(2, RoundingMode.HALF_UP))
                     .monthlyIncome(monthlyIncomeVar.setScale(2, RoundingMode.HALF_UP))
                     .withdraw(withdrawLimitVar.setScale(2, RoundingMode.HALF_UP))
-                    .annualInterest(annualInterestVar)
+                    .annualInterest(ANNUAL_INTEREST)
                     .build();
             return creditAnalysisMapper.entityFromModel(creditAnalysisModelUpdated);
         }
     }
 
     public BigDecimal checkApprovedLimit(BigDecimal monthlyIncome, BigDecimal requestedAmount) {
-<<<<<<< HEAD
-
-=======
         // Criar constantes para valores constantes
->>>>>>> feature/credit-analise
-        final BigDecimal maxMonthlyIncome = BigDecimal.valueOf(50000);
         BigDecimal consideredValue = monthlyIncome;
-        if (monthlyIncome.compareTo(maxMonthlyIncome) > 0) {
-            consideredValue = maxMonthlyIncome;
+        if (monthlyIncome.compareTo(MAX_MONTHLY_INCOME) > 0) {
+            consideredValue = MAX_MONTHLY_INCOME;
         }
 
         final BigDecimal approvedLimit;
@@ -145,8 +130,4 @@ public class CreditAnalysisService {
         }
         return getCreditAnalysisByClientId(clientDto.get(0).id());
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> feature/credit-analise
