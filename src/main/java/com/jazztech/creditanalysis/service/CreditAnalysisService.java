@@ -1,7 +1,11 @@
 package com.jazztech.creditanalysis.service;
 
 import com.jazztech.creditanalysis.apiclient.ClientApiClient;
+<<<<<<< HEAD
 import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
+=======
+import com.jazztech.creditanalysis.apiclient.clientdto.ClientDto;
+>>>>>>> feature/credit-analise
 import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
 import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
 import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
@@ -47,6 +51,10 @@ public class CreditAnalysisService {
         final int requestedAmountIsGreaterThanMonthlyIncome = requestedAmountVar.compareTo(monthlyIncomeVar);
 
         if (requestedAmountIsGreaterThanMonthlyIncome > 0) {
+<<<<<<< HEAD
+=======
+            // utilizar BigDecimal.ZERO
+>>>>>>> feature/credit-analise
             final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
                     .clientId(creditAnalysisModel.clientId())
                     .approved(false)
@@ -60,6 +68,10 @@ public class CreditAnalysisService {
         } else {
             final BigDecimal approvedLimitVar = checkApprovedLimit(monthlyIncomeVar, requestedAmountVar);
             final BigDecimal withdrawLimitVar = checkWithdrawLimit(approvedLimitVar);
+<<<<<<< HEAD
+=======
+            // Constante
+>>>>>>> feature/credit-analise
             final Double annualInterestVar = 0.15;
             final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
                     .clientId(creditAnalysisModel.clientId())
@@ -75,7 +87,11 @@ public class CreditAnalysisService {
     }
 
     public BigDecimal checkApprovedLimit(BigDecimal monthlyIncome, BigDecimal requestedAmount) {
+<<<<<<< HEAD
 
+=======
+        // Criar constantes para valores constantes
+>>>>>>> feature/credit-analise
         final BigDecimal maxMonthlyIncome = BigDecimal.valueOf(50000);
         BigDecimal consideredValue = monthlyIncome;
         if (monthlyIncome.compareTo(maxMonthlyIncome) > 0) {
@@ -129,4 +145,8 @@ public class CreditAnalysisService {
         }
         return getCreditAnalysisByClientId(clientDto.get(0).id());
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> feature/credit-analise

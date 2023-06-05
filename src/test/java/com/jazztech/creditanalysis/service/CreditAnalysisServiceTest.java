@@ -1,7 +1,11 @@
 package com.jazztech.creditanalysis.service;
 
 import com.jazztech.creditanalysis.apiclient.ClientApiClient;
+<<<<<<< HEAD
 import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
+=======
+import com.jazztech.creditanalysis.apiclient.clientdto.ClientDto;
+>>>>>>> feature/credit-analise
 import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
 import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
 import com.jazztech.creditanalysis.mapper.CreditAnalysisMapper;
@@ -95,6 +99,10 @@ class CreditAnalysisServiceTest {
 
     @Test
     void should_throw_ClientNotFoundException_if_it_does_not_exist_by_id(){
+<<<<<<< HEAD
+=======
+        // O mock deve retornar um optional empty
+>>>>>>> feature/credit-analise
         when(creditAnalysisRepository.findById(analysisID.capture())).thenThrow(ClientNotFoundException.class);
         ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
                 () -> creditAnalysisService.getCreditAnalysisById(UUID.randomUUID()));

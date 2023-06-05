@@ -40,7 +40,12 @@ public class CreditAnalysisEntity {
     LocalDateTime date;
 
     @Builder(toBuilder = true)
+<<<<<<< HEAD
     public CreditAnalysisEntity(UUID id, UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount, BigDecimal monthlyIncome, BigDecimal withdraw, Double annualInterest, LocalDateTime date) {
+=======
+    public CreditAnalysisEntity(UUID id, UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount,
+                                BigDecimal monthlyIncome, BigDecimal withdraw, Double annualInterest, LocalDateTime date) {
+>>>>>>> feature/credit-analise
         this.id = id;
         this.clientId = clientId;
         this.approved = approved;

@@ -36,16 +36,28 @@ public class CreditAnalysisController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.FOUND)
+<<<<<<< HEAD
     public List<CreditAnalysisResponse> getAllAnalysis() {
         return creditAnalysisService.getAllCreditAnalysis();
     }
 
+=======
+    public List<CreditAnalysisResponse> getAllAnalysis(@RequestParam(value = "clientId", required = false) UUID clientId) {
+        return creditAnalysisService.getAllCreditAnalysis();
+    }
+
+    // Utilizar query parameters para filtros, não criar
+>>>>>>> feature/credit-analise
     @GetMapping("/findBy-clientId/{creditAnalysisClientId}")
     @ResponseStatus(HttpStatus.FOUND)
     public List<CreditAnalysisResponse> getCreditAnalysisByClientId(@PathVariable UUID creditAnalysisClientId) {
         return creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisClientId);
     }
 
+<<<<<<< HEAD
+=======
+    // Utilizar query parameters para filtros
+>>>>>>> feature/credit-analise
     @GetMapping("/findBy-clientCPF")
     @ResponseStatus(HttpStatus.FOUND)
     public List<CreditAnalysisResponse> getCreditAnalysisByClientCPF(@RequestParam(value = "cpf", required = false) String creditAnalysisClientCPF) {
