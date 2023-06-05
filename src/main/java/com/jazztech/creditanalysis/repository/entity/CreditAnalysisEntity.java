@@ -40,7 +40,8 @@ public class CreditAnalysisEntity {
     LocalDateTime date;
 
     @Builder(toBuilder = true)
-    public CreditAnalysisEntity(UUID id, UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount, BigDecimal monthlyIncome, BigDecimal withdraw, Double annualInterest, LocalDateTime date) {
+    public CreditAnalysisEntity(UUID id, UUID clientId, Boolean approved, BigDecimal approvedLimit, BigDecimal requestedAmount,
+                                BigDecimal monthlyIncome, BigDecimal withdraw, Double annualInterest, LocalDateTime date) {
         this.id = id;
         this.clientId = clientId;
         this.approved = approved;

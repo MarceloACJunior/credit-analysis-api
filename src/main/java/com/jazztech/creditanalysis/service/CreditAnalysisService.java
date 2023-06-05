@@ -1,7 +1,7 @@
 package com.jazztech.creditanalysis.service;
 
 import com.jazztech.creditanalysis.apiclient.ClientApiClient;
-import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
+import com.jazztech.creditanalysis.apiclient.clientdto.ClientDto;
 import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
 import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
 import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
@@ -47,6 +47,7 @@ public class CreditAnalysisService {
         final int requestedAmountIsGreaterThanMonthlyIncome = requestedAmountVar.compareTo(monthlyIncomeVar);
 
         if (requestedAmountIsGreaterThanMonthlyIncome > 0) {
+            // utilizar BigDecimal.ZERO
             final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
                     .clientId(creditAnalysisModel.clientId())
                     .approved(false)
@@ -60,6 +61,7 @@ public class CreditAnalysisService {
         } else {
             final BigDecimal approvedLimitVar = checkApprovedLimit(monthlyIncomeVar, requestedAmountVar);
             final BigDecimal withdrawLimitVar = checkWithdrawLimit(approvedLimitVar);
+            // Constante
             final Double annualInterestVar = 0.15;
             final CreditAnalysisModel creditAnalysisModelUpdated = CreditAnalysisModel.builder()
                     .clientId(creditAnalysisModel.clientId())
@@ -75,7 +77,7 @@ public class CreditAnalysisService {
     }
 
     public BigDecimal checkApprovedLimit(BigDecimal monthlyIncome, BigDecimal requestedAmount) {
-
+        // Criar constantes para valores constantes
         final BigDecimal maxMonthlyIncome = BigDecimal.valueOf(50000);
         BigDecimal consideredValue = monthlyIncome;
         if (monthlyIncome.compareTo(maxMonthlyIncome) > 0) {
