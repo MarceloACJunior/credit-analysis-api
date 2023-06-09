@@ -1,6 +1,5 @@
 package com.jazztech.creditanalysis.apiclient.clientdto;
 
-
 import java.util.UUID;
 import lombok.Builder;
 
