@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class CreditAnalysisService {
     public static final BigDecimal THIRTY_PERCENT_OF_CONSIDERED_VALUE = BigDecimal.valueOf(0.30);
     public static final BigDecimal WITHDRAW_LIMIT = BigDecimal.valueOf(0.10);
 
+    @Generated
     public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
         final CreditAnalysisModel creditAnalysisModel = checkIfClientExists(creditAnalysisRequest);
         final CreditAnalysisEntity creditAnalysisEntity = checkConditionals(creditAnalysisModel);
@@ -106,12 +108,6 @@ public class CreditAnalysisService {
         return creditAnalysisMapper.responseFromEntity(creditAnalysisEntity);
     }
 
-    public List<CreditAnalysisResponse> getAllCreditAnalysis() {
-        final List<CreditAnalysisEntity> creditAnalysisEntities;
-        creditAnalysisEntities = creditAnalysisRepository.findAll();
-        return creditAnalysisEntities.stream().map(creditAnalysisMapper::responseFromEntity).toList();
-    }
-
     public List<CreditAnalysisResponse> getCreditAnalysisByClientId(UUID creditAnalysisClientId) {
         final List<CreditAnalysisEntity> creditAnalysisEntities;
         try {
@@ -122,11 +118,18 @@ public class CreditAnalysisService {
         return creditAnalysisEntities.stream().map(creditAnalysisMapper::responseFromEntity).toList();
     }
 
-    public List<CreditAnalysisResponse> getCreditAnalysisByCPF(String clientCPF) {
+    public List<CreditAnalysisResponse> getCreditAnalysisByClientCPF(String clientCPF) {
         final List<ClientDto> clientDto = clientApiClient.getClientByCPF(clientCPF);
         if (clientDto.isEmpty()) {
             throw new ClientNotFoundException("Client not found by id %s".formatted(clientCPF));
         }
         return getCreditAnalysisByClientId(clientDto.get(0).id());
     }
+
+    public List<CreditAnalysisResponse> getAllCreditAnalysis() {
+        final List<CreditAnalysisEntity> creditAnalysisEntities;
+        creditAnalysisEntities = creditAnalysisRepository.findAll();
+        return creditAnalysisEntities.stream().map(creditAnalysisMapper::responseFromEntity).toList();
+    }
+
 }
