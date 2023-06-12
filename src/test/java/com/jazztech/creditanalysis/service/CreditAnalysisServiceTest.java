@@ -105,8 +105,7 @@ class CreditAnalysisServiceTest {
 
     @Test
     void should_throw_ClientNotFoundException_if_it_does_not_exist_by_id() {
-        // O mock deve retornar um optional empty
-        when(creditAnalysisRepository.findById(analysisID.capture())).thenThrow(ClientNotFoundException.class);
+        when(creditAnalysisRepository.findById(analysisID.capture())).thenReturn(Optional.empty());
         ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
                 () -> creditAnalysisService.getCreditAnalysisById(UUID.randomUUID()));
     }
