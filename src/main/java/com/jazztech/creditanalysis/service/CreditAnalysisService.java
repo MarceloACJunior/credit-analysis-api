@@ -9,10 +9,10 @@ import com.jazztech.creditanalysis.mapper.CreditAnalysisMapper;
 import com.jazztech.creditanalysis.model.CreditAnalysisModel;
 import com.jazztech.creditanalysis.repository.CreditAnalysisRepository;
 import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
-import feign.FeignException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.Generated;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +21,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CreditAnalysisService {
-    private final ClientApiClient clientApiClient;
-    private final CreditAnalysisMapper creditAnalysisMapper;
-    private final CreditAnalysisRepository creditAnalysisRepository;
-
     public static final Double ANNUAL_INTEREST = 0.15;
     public static final BigDecimal MAX_MONTHLY_INCOME = BigDecimal.valueOf(50_000);
     public static final BigDecimal FIFTEEN_PERCENT_OF_CONSIDERED_VALUE = BigDecimal.valueOf(0.15);
     public static final BigDecimal THIRTY_PERCENT_OF_CONSIDERED_VALUE = BigDecimal.valueOf(0.30);
     public static final BigDecimal WITHDRAW_LIMIT = BigDecimal.valueOf(0.10);
+    private final ClientApiClient clientApiClient;
+    private final CreditAnalysisMapper creditAnalysisMapper;
+    private final CreditAnalysisRepository creditAnalysisRepository;
 
     @Generated
     public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
@@ -40,9 +39,8 @@ public class CreditAnalysisService {
     }
 
     public CreditAnalysisModel checkIfClientExists(CreditAnalysisRequest creditAnalysisRequest) {
-        try {
-            clientApiClient.getClientById(creditAnalysisRequest.clientId());
-        } catch (FeignException fe) {
+        final ClientDto clientID = clientApiClient.getClientById(creditAnalysisRequest.clientId());
+        if (Objects.isNull(clientID)) {
             throw new ClientNotFoundException("Client not found by id %s".formatted(creditAnalysisRequest.clientId()));
         }
         return creditAnalysisMapper.modelFromRequest(creditAnalysisRequest);
@@ -109,10 +107,8 @@ public class CreditAnalysisService {
     }
 
     public List<CreditAnalysisResponse> getCreditAnalysisByClientId(UUID creditAnalysisClientId) {
-        final List<CreditAnalysisEntity> creditAnalysisEntities;
-        try {
-            creditAnalysisEntities = creditAnalysisRepository.findByClientId(creditAnalysisClientId);
-        } catch (FeignException fe) {
+        final List<CreditAnalysisEntity> creditAnalysisEntities = creditAnalysisRepository.findByClientId(creditAnalysisClientId);
+        if (creditAnalysisEntities.isEmpty()) {
             throw new ClientNotFoundException("Client not found by ID %s".formatted(creditAnalysisClientId));
         }
         return creditAnalysisEntities.stream().map(creditAnalysisMapper::responseFromEntity).toList();
@@ -121,7 +117,7 @@ public class CreditAnalysisService {
     public List<CreditAnalysisResponse> getCreditAnalysisByClientCPF(String clientCPF) {
         final List<ClientDto> clientDto = clientApiClient.getClientByCPF(clientCPF);
         if (clientDto.isEmpty()) {
-            throw new ClientNotFoundException("Client not found by id %s".formatted(clientCPF));
+            throw new ClientNotFoundException("Client not found by cpf %s".formatted(clientCPF));
         }
         return getCreditAnalysisByClientId(clientDto.get(0).id());
     }

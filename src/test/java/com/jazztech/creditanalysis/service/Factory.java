@@ -19,7 +19,7 @@ public class Factory {
 
     public static CreditAnalysisModel creditAnalysisModelNotApprovedFactory() {
         return CreditAnalysisModel.builder()
-                .clientId(UUID.randomUUID())
+                .clientId(UUID.fromString("03df448f-73e7-44f0-bfd1-66c120d7adde"))
                 .requestedAmount(BigDecimal.valueOf(50000))
                 .monthlyIncome(BigDecimal.valueOf(7500))
                 .build();
@@ -27,7 +27,7 @@ public class Factory {
 
     public static CreditAnalysisModel creditAnalysisModelApprovedFactory() {
         return CreditAnalysisModel.builder()
-                .clientId(UUID.randomUUID())
+                .clientId(UUID.fromString("03df448f-73e7-44f0-bfd1-66c120d7adde"))
                 .requestedAmount(BigDecimal.valueOf(7500))
                 .monthlyIncome(BigDecimal.valueOf(50000))
                 .build();
@@ -51,7 +51,7 @@ public class Factory {
 
     public static CreditAnalysisEntity creditAnalysisEntityFactory(){
         return CreditAnalysisEntity.builder()
-                .id(UUID.fromString("eea91dca-9532-4caf-8d88-4889b4c24839"))
+                .id(UUID.fromString("03df448f-73e7-44f0-bfd1-66c120d7adde"))
                 .build();
     }
 }

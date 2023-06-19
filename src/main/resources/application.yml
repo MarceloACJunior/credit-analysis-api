@@ -12,6 +12,7 @@ spring:
             connectTimeout: 3000
             readTimeout: 500
             loggerLevel: BASIC
+            dismiss404: true
   sql:
     init:
       continue-on-error: true

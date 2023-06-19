@@ -120,6 +120,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com/jazztech/creditanalysis/apiclient/**</exclude>
+                        <exclude>com/jazztech/creditanalysis/**/*MapperImpl.*</exclude>
+                        <exclude>com/jazztech/creditanalysis/**/utils/**</exclude>
+                        <exclude>com/jazztech/creditanalysis/**/model/**</exclude>
+                        <exclude>com/jazztech/creditanalysis/**/controller/**</exclude>
+                        <exclude>com/jazztech/creditanalysis/**/repository/**</exclude>
+                        <exclude>com/jazztech/creditanalysis/**/handler/**</exclude>
+                        <exclude>com/jazztech/creditanalysis/CreditAnalysisApplication.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

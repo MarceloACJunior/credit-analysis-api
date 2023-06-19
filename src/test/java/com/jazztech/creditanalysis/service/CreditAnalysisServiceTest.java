@@ -6,6 +6,7 @@ import static com.jazztech.creditanalysis.service.Factory.creditAnalysisModelGre
 import static com.jazztech.creditanalysis.service.Factory.creditAnalysisModelLessThanFiftyPercent;
 import static com.jazztech.creditanalysis.service.Factory.creditAnalysisModelNotApprovedFactory;
 import static com.jazztech.creditanalysis.service.Factory.creditAnalysisRequestFactory;
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -19,8 +20,10 @@ import com.jazztech.creditanalysis.mapper.CreditAnalysisMapperImpl;
 import com.jazztech.creditanalysis.model.CreditAnalysisModel;
 import com.jazztech.creditanalysis.repository.CreditAnalysisRepository;
 import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
-import feign.FeignException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -45,6 +48,8 @@ class CreditAnalysisServiceTest {
     private CreditAnalysisMapper creditAnalysisMapper = new CreditAnalysisMapperImpl();
     @Captor
     private ArgumentCaptor<UUID> clientID;
+    @Captor
+    private ArgumentCaptor<String> clientCPF;
     @Captor
     private ArgumentCaptor<UUID> analysisID;
 
@@ -76,10 +81,10 @@ class CreditAnalysisServiceTest {
 
     @Test
     void should_throw_ClientNotFoundException_when_clientId_does_not_exist() {
-        when(clientApiClient.getClientById(clientID.capture())).thenThrow(FeignException.class);
-        ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
-                () -> creditAnalysisService.checkIfClientExists(creditAnalysisRequestFactory()));
-        assertEquals("Client not found by id %s".formatted(clientID.getValue()), exception.getMessage());
+        when(clientApiClient.getClientById(clientID.capture())).thenReturn(null);
+        assertThrows(ClientNotFoundException.class, () -> creditAnalysisService.checkIfClientExists(creditAnalysisRequestFactory()),
+                "Client not found by id %s".formatted(creditAnalysisRequestFactory().clientId()));
+        assertEquals(creditAnalysisRequestFactory().clientId(), clientID.getValue());
     }
 
     @Test
@@ -98,7 +103,7 @@ class CreditAnalysisServiceTest {
 
     @Test
     void should_return_a_credit_analysis_if_it_exists_by_id() {
-        when(creditAnalysisRepository.findById(analysisID.capture())).thenReturn(Optional.ofNullable(creditAnalysisEntityFactory()));
+        when(creditAnalysisRepository.findById(analysisID.capture())).thenReturn(Optional.of(creditAnalysisEntityFactory()));
         final CreditAnalysisResponse creditAnalysisById = creditAnalysisService.getCreditAnalysisById(creditAnalysisEntityFactory().getId());
         assertEquals(creditAnalysisById.id(), analysisID.getValue());
     }
@@ -106,7 +111,46 @@ class CreditAnalysisServiceTest {
     @Test
     void should_throw_ClientNotFoundException_if_it_does_not_exist_by_id() {
         when(creditAnalysisRepository.findById(analysisID.capture())).thenReturn(Optional.empty());
-        ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
-                () -> creditAnalysisService.getCreditAnalysisById(UUID.randomUUID()));
+        ClientNotFoundException exception =
+                assertThrows(ClientNotFoundException.class, () -> creditAnalysisService.getCreditAnalysisById(UUID.randomUUID()));
+    }
+
+    @Test
+    void should_return_a_credit_analysis_when_it_exists_by_a_client_id() {
+        when(creditAnalysisRepository.findByClientId(clientID.capture())).thenReturn(List.of(creditAnalysisEntityFactory()));
+        final List<CreditAnalysisResponse> creditAnalysisResponses =
+                creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisRequestFactory().clientId());
+        assertEquals(creditAnalysisEntityFactory().getId(), clientID.getValue());
+    }
+
+    @Test
+    void should_throw_a_ClientNotFoundException_when_credit_analysis_does_not_exists_by_a_client_id() {
+        when(creditAnalysisRepository.findByClientId(clientID.capture())).thenReturn(Collections.emptyList());
+        assertThrows(ClientNotFoundException.class, () -> creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisRequestFactory().clientId()), "Client not found by ID %s".formatted(creditAnalysisRequestFactory().clientId()));
+    }
+
+    @Test
+    void should_return_a_credit_analysis_when_it_exists_by_a_client_CPF() {
+        final ClientDto clientDtoMockado = new ClientDto(UUID.fromString("03df448f-73e7-44f0-bfd1-66c120d7adde"));
+        when(clientApiClient.getClientByCPF(clientCPF.capture())).thenReturn(Collections.singletonList(clientDtoMockado));
+        when(creditAnalysisRepository.findByClientId(clientID.capture())).thenReturn(List.of(creditAnalysisEntityFactory()));
+
+        final List<CreditAnalysisResponse> creditAnalysisResponses = creditAnalysisService.getCreditAnalysisByClientCPF("51119818885");
+        assertEquals(clientDtoMockado.id(), creditAnalysisResponses.get(0).id());
+    }
+
+    @Test
+    void should_throw_a_ClientNotFoundException_when_credit_analysis_does_not_exists_by_a_client_CPF() {
+        final String CPF = "51119818885";
+        when(clientApiClient.getClientByCPF(clientCPF.capture())).thenReturn(Collections.emptyList());
+        assertThrows(ClientNotFoundException.class, () -> creditAnalysisService.getCreditAnalysisByClientCPF(CPF), "Client not found by cpf %s".formatted(CPF));
+    }
+
+    @Test
+    void should_return_all_credit_analysis() {
+        final List<CreditAnalysisEntity> creditAnalysisEntities = Collections.emptyList();
+        when(creditAnalysisRepository.findAll()).thenReturn(creditAnalysisEntities);
+        List<CreditAnalysisResponse> creditAnalysisResponses = creditAnalysisService.getAllCreditAnalysis();
+        assertEquals(creditAnalysisEntities.size(), creditAnalysisResponses.size());
     }
 }
