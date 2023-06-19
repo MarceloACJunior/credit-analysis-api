@@ -1,6 +1,6 @@
 package com.jazztech.creditanalysis.apiclient;
 
-import com.jazztech.creditanalysis.apiclient.ClientDto.ClientDto;
+import com.jazztech.creditanalysis.apiclient.clientdto.ClientDto;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cloud.openfeign.FeignClient;

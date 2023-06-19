@@ -3,9 +3,11 @@ package com.jazztech.creditanalysis.controller;
 import com.jazztech.creditanalysis.controller.request.CreditAnalysisRequest;
 import com.jazztech.creditanalysis.controller.response.CreditAnalysisResponse;
 import com.jazztech.creditanalysis.service.CreditAnalysisService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,19 +38,14 @@ public class CreditAnalysisController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.FOUND)
-    public List<CreditAnalysisResponse> getAllAnalysis() {
+    public List<CreditAnalysisResponse> getCreditAnalysisBy(@RequestParam(value = "id", required = false) UUID creditAnalysisClientID,
+                                                            @RequestParam(value = "cpf", required = false)
+                                                            @Valid @CPF String creditAnalysisClientCPF) {
+        if (creditAnalysisClientID != null) {
+            return creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisClientID);
+        } else if (creditAnalysisClientCPF != null) {
+            return creditAnalysisService.getCreditAnalysisByClientCPF(creditAnalysisClientCPF);
+        }
         return creditAnalysisService.getAllCreditAnalysis();
-    }
-
-    @GetMapping("/findBy-clientId/{creditAnalysisClientId}")
-    @ResponseStatus(HttpStatus.FOUND)
-    public List<CreditAnalysisResponse> getCreditAnalysisByClientId(@PathVariable UUID creditAnalysisClientId) {
-        return creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisClientId);
-    }
-
-    @GetMapping("/findBy-clientCPF")
-    @ResponseStatus(HttpStatus.FOUND)
-    public List<CreditAnalysisResponse> getCreditAnalysisByClientCPF(@RequestParam(value = "cpf", required = false) String creditAnalysisClientCPF) {
-        return creditAnalysisService.getCreditAnalysisByCPF(creditAnalysisClientCPF);
     }
 }
