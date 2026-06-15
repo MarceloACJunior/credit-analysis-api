@@ -1,42 +1,23 @@
 package com.jazztech.creditanalysis.repository.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Builder;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Immutable;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "CREDIT_ANALYSIS")
-@Immutable
+@Document(collection = "credit_analysis")
 public class CreditAnalysisEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
     UUID id;
-    @Column(name = "client_id")
     UUID clientId;
-    @Column(name = "approved")
     Boolean approved;
-    @Column(name = "approved_limit")
     BigDecimal approvedLimit;
-    @Column(name = "requested_amount")
     BigDecimal requestedAmount;
-    @Column(name = "monthly_income")
     BigDecimal monthlyIncome;
-    @Column(name = "withdraw")
     BigDecimal withdraw;
-    @Column(name = "annual_interest")
     Double annualInterest;
-    @CreationTimestamp
-    @Column(name = "date")
     LocalDateTime date;
 
     @Builder(toBuilder = true)

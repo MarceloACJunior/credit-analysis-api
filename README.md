@@ -10,7 +10,8 @@ Dado um cliente (validado via `client-api`) e uma renda mensal, aplica regras de
 
 - **Java 17** + **Spring Boot 3.0.6**
 - **Spring Cloud OpenFeign** — comunicação com `client-api`
-- **Spring Data JPA** + **PostgreSQL**
+- **Resilience4j (Circuit Breaker)** — proteção da chamada ao `client-api`
+- **Spring Data MongoDB**
 - **MapStruct** | **Lombok** | **JUnit 5** + **Mockito**
 
 ## Rodando
@@ -26,21 +27,18 @@ Sobe todos os serviços do ecossistema de uma vez. Ver [README raiz](../README.m
 > **Atenção:** este projeto não possui Maven Wrapper (`.mvn/`). Use o `mvn` instalado no sistema.
 
 ```bash
-# 1. Subir o banco PostgreSQL (porta 5433)
-docker-compose up -d
+# 1. Subir o MongoDB (porta 27017)
+docker run -d --name mongo -p 27017:27017 mongo:7
 
-# 2. Criar as tabelas
-docker cp database/ddl.sql postgresql:/tmp/ddl.sql
-docker exec postgresql psql -U admin -d postgres -f /tmp/ddl.sql
-
-# 3. Iniciar a aplicação
+# 2. Iniciar a aplicação (a collection é criada automaticamente)
 mvn spring-boot:run
 
 # Parar o banco
-docker-compose down
+docker stop mongo && docker rm mongo
 ```
 
-A API fica disponível em `http://localhost:9001`.
+A API fica disponível em `http://localhost:9001`. A URI do Mongo pode ser sobrescrita
+via variável de ambiente `SPRING_DATA_MONGODB_URI` (padrão `mongodb://localhost:27017/creditdb`).
 
 ## Endpoints
 
@@ -79,7 +77,15 @@ Content-Type: application/json
 
 ## Banco de dados
 
-Schema em `database/ddl.sql`. PostgreSQL na porta `5433`, usuário `admin`, senha `senha123`, banco `postgres`.
+**MongoDB** na porta `27017`, database `creditdb`, collection `credit_analysis`. Sem schema/DDL —
+a collection é criada na primeira inserção. O `id` de cada documento é um UUID gerado pela aplicação.
+
+## Resiliência
+
+A chamada ao `client-api` é protegida por um **circuit breaker (Resilience4j)** integrado ao OpenFeign.
+Se o `client-api` estiver fora do ar, após o limiar de falhas o circuito abre e a API responde
+**`503 Service Unavailable`** rapidamente, em vez de pendurar a requisição. Erros de negócio do
+`client-api` (cliente não encontrado, 4xx) continuam sendo tratados como `400`.
 
 ## Testes
 

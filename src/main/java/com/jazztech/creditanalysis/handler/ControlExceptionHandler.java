@@ -1,5 +1,6 @@
 package com.jazztech.creditanalysis.handler;
 
+import com.jazztech.creditanalysis.handler.exceptions.ClientApiUnavailableException;
 import com.jazztech.creditanalysis.handler.exceptions.ClientNotFoundException;
 import com.jazztech.creditanalysis.handler.exceptions.InvalidUUIDException;
 import java.net.URI;
@@ -38,6 +39,15 @@ public class ControlExceptionHandler {
         problemDetail.setType(URI.create(""));
         problemDetail.setProperty(TIMESTAMP, LocalDateTime.now());
         problemDetail.setDetail(ex.getMessage());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ClientApiUnavailableException.class)
+    public ProblemDetail clientApiUnavailableExceptionHandler(ClientApiUnavailableException e) {
+        final ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.SERVICE_UNAVAILABLE);
+        problemDetail.setType(URI.create("http://jazztech.com/service-unavailable"));
+        problemDetail.setProperty(TIMESTAMP, LocalDateTime.now());
+        problemDetail.setDetail(e.getMessage());
         return problemDetail;
     }
 }

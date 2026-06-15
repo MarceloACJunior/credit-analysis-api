@@ -4,34 +4,37 @@ spring:
   application:
     name: credit-analysis
 
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/creditdb}
+      uuid-representation: standard
+
   cloud:
     openfeign:
+      circuitbreaker:
+        enabled: true
       client:
         config:
           clientApiClient:
             connectTimeout: 3000
             readTimeout: 500
             loggerLevel: BASIC
-  sql:
-    init:
-      continue-on-error: true
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/postgres
-    username: admin
-    password: senha123
-    hikari:
-      minimum-idle: 0
-      maximum-pool-size: 15
-      connection-timeout: 3000
-      idle-timeout: 300000
-      max-lifetime: 600000
-      initialization-fail-timeout: -1
-      validation-timeout: 1000
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    generate-ddl: false
-    show-sql: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        # Erros de negócio 4xx do downstream não devem abrir o circuito
+        ignore-exceptions:
+          - feign.FeignException$FeignClientException
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 4s
 
 client:
   api:

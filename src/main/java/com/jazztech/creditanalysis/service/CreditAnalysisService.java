@@ -9,9 +9,9 @@ import com.jazztech.creditanalysis.mapper.CreditAnalysisMapper;
 import com.jazztech.creditanalysis.model.CreditAnalysisModel;
 import com.jazztech.creditanalysis.repository.CreditAnalysisRepository;
 import com.jazztech.creditanalysis.repository.entity.CreditAnalysisEntity;
-import feign.FeignException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +27,16 @@ public class CreditAnalysisService {
     public CreditAnalysisResponse creditAnalysisRequest(CreditAnalysisRequest creditAnalysisRequest) {
         final CreditAnalysisModel creditAnalysisModel = checkIfClientExists(creditAnalysisRequest);
         final CreditAnalysisEntity creditAnalysisEntity = checkConditionals(creditAnalysisModel);
-        final CreditAnalysisEntity creditAnalysisSaved = creditAnalysisRepository.save(creditAnalysisEntity);
+        final CreditAnalysisEntity creditAnalysisToSave = creditAnalysisEntity.toBuilder()
+                .id(UUID.randomUUID())
+                .date(LocalDateTime.now())
+                .build();
+        final CreditAnalysisEntity creditAnalysisSaved = creditAnalysisRepository.save(creditAnalysisToSave);
         return creditAnalysisMapper.responseFromEntity(creditAnalysisSaved);
     }
 
     public CreditAnalysisModel checkIfClientExists(CreditAnalysisRequest creditAnalysisRequest) {
-        try {
-            clientApiClient.getClientById(creditAnalysisRequest.clientId());
-        } catch (FeignException fe) {
-            throw new ClientNotFoundException("Client not found by id %s".formatted(creditAnalysisRequest.clientId()));
-        }
+        clientApiClient.getClientById(creditAnalysisRequest.clientId());
         return creditAnalysisMapper.modelFromRequest(creditAnalysisRequest);
     }
 
@@ -113,12 +113,7 @@ public class CreditAnalysisService {
     }
 
     public List<CreditAnalysisResponse> getCreditAnalysisByClientId(UUID creditAnalysisClientId) {
-        final List<CreditAnalysisEntity> creditAnalysisEntities;
-        try {
-            creditAnalysisEntities = creditAnalysisRepository.findByClientId(creditAnalysisClientId);
-        } catch (FeignException fe) {
-            throw new ClientNotFoundException("Client not found by ID %s".formatted(creditAnalysisClientId));
-        }
+        final List<CreditAnalysisEntity> creditAnalysisEntities = creditAnalysisRepository.findByClientId(creditAnalysisClientId);
         return creditAnalysisEntities.stream().map(creditAnalysisMapper::responseFromEntity).toList();
     }
 
