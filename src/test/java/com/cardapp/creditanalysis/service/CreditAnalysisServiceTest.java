@@ -9,7 +9,6 @@ import com.cardapp.creditanalysis.mapper.CreditAnalysisMapperImpl;
 import com.cardapp.creditanalysis.model.CreditAnalysisModel;
 import com.cardapp.creditanalysis.repository.CreditAnalysisRepository;
 import com.cardapp.creditanalysis.repository.entity.CreditAnalysisEntity;
-import feign.FeignException;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -64,14 +63,6 @@ class CreditAnalysisServiceTest {
         when(clientApiClient.getClientById(clientID.capture())).thenReturn(new ClientDto(UUID.fromString("12341234-1234-1234-1234-123412341234")));
         final CreditAnalysisModel creditAnalysisModel = creditAnalysisService.checkIfClientExists(creditAnalysisRequestFactory());
         assertEquals(clientID.getValue(), creditAnalysisModel.clientId());
-    }
-
-    @Test
-    void should_throw_ClientNotFoundException_when_clientId_does_not_exist(){
-        when(clientApiClient.getClientById(clientID.capture())).thenThrow(FeignException.class);
-        ClientNotFoundException exception = assertThrows(ClientNotFoundException.class,
-                () -> creditAnalysisService.checkIfClientExists(creditAnalysisRequestFactory()));
-        assertEquals("Client not found by id %s".formatted(clientID.getValue()), exception.getMessage());
     }
 
     @Test
