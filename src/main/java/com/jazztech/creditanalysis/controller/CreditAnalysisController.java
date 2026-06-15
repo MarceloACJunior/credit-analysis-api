@@ -29,25 +29,25 @@ public class CreditAnalysisController {
     }
 
     @GetMapping("{creditAnalysisId}")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public CreditAnalysisResponse getCreditAnalysisById(@PathVariable UUID creditAnalysisId) {
         return creditAnalysisService.getCreditAnalysisById(creditAnalysisId);
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public List<CreditAnalysisResponse> getAllAnalysis() {
         return creditAnalysisService.getAllCreditAnalysis();
     }
 
     @GetMapping("/findBy-clientId/{creditAnalysisClientId}")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public List<CreditAnalysisResponse> getCreditAnalysisByClientId(@PathVariable UUID creditAnalysisClientId) {
         return creditAnalysisService.getCreditAnalysisByClientId(creditAnalysisClientId);
     }
 
     @GetMapping("/findBy-clientCPF")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public List<CreditAnalysisResponse> getCreditAnalysisByClientCPF(@RequestParam(value = "cpf", required = false) String creditAnalysisClientCPF) {
         return creditAnalysisService.getCreditAnalysisByCPF(creditAnalysisClientCPF);
     }
