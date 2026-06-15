@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.jazztech.credit-analysis' is invalid and this project uses 'com.jazztech.creditanalysis' instead.
+* The original package name 'com.cardapp.credit-analysis' is invalid and this project uses 'com.cardapp.creditanalysis' instead.
 
 # Getting Started
 

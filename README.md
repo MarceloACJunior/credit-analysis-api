@@ -1,6 +1,6 @@
 # credit-analysis-api
 
-Microsserviço responsável pela análise e aprovação de crédito para clientes do ecossistema JazzTech.
+Microsserviço responsável pela análise e aprovação de crédito para clientes do ecossistema CardApp.
 
 ## Visão Geral
 

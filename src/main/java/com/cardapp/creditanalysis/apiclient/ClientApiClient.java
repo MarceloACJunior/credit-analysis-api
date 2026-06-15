@@ -1,0 +1,20 @@
+package com.cardapp.creditanalysis.apiclient;
+
+import com.cardapp.creditanalysis.apiclient.ClientDto.ClientDto;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@FeignClient(name = "clientApiClient", url = "${client.api.url}",
+        fallbackFactory = ClientApiClientFallbackFactory.class)
+public interface ClientApiClient {
+
+    @GetMapping("/{clientId}")
+    ClientDto getClientById(@PathVariable(value = "clientId") UUID clientId);
+
+    @GetMapping
+    List<ClientDto> getClientByCPF(@RequestParam(value = "cpf") String clientCPF);
+}
